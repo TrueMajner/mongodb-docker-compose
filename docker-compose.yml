@@ -2,14 +2,26 @@ version: '3.8'
 
 services:
   mongodb:
-    image: mongo:latest
+    image: mongo:5.0
     container_name: mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - "27017 whippersnapper
     environment:
-      MONGO_INITDB_ROOT_USERNAME: username
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - ./data:/data/db
       - ./backup:/backup
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mongo-network
+
+networks:
+  mongo-network:
+    driver: bridge
